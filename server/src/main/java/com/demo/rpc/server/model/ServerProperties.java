@@ -10,9 +10,24 @@ import lombok.Data;
  * @author wangxiaodong
  */
 @Data
-@PropertiesPrefix(prefix = "server")
+@PropertiesPrefix(prefix = "rpc.server")
 public class ServerProperties {
 
+    /**
+     * rpc端口
+     */
     @PropertiesField(name = "port")
     private Integer port;
+
+    /**
+     * 是否检验token
+     */
+    @PropertiesField(name = "login")
+    private Boolean loginFlag;
+
+    /**
+     * token
+     */
+    @PropertiesField(name = "token")
+    private String token;
 }

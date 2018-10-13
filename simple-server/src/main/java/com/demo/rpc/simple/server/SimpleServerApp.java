@@ -1,0 +1,17 @@
+package com.demo.rpc.simple.server;
+
+import com.demo.rpc.server.ServerApplication;
+
+import java.io.IOException;
+
+/**
+ * Created on 2018/10/13.
+ *
+ * @author wangxiaodong
+ */
+public class SimpleServerApp {
+
+    public static void main(String[] args) {
+        ServerApplication.run(args);
+    }
+}
