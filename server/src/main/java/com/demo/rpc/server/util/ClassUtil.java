@@ -46,7 +46,7 @@ public class ClassUtil {
             try {
                 Class<?> clazz = ClassLoader.getSystemClassLoader().loadClass(beanDefinition.getBeanClassName());
                 RpcService rpcService = clazz.getAnnotation(RpcService.class);
-                add(rpcService.value().getSimpleName(), null, clazz);
+                add(rpcService.value().getName(), null, clazz);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
