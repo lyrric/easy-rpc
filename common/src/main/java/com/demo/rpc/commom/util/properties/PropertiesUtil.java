@@ -1,5 +1,7 @@
 package com.demo.rpc.commom.util.properties;
 
+import com.demo.rpc.commom.exception.MissPropertiesException;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Properties;
@@ -18,6 +20,7 @@ public class PropertiesUtil {
      * @param <T>
      * @return
      */
+    @SuppressWarnings("unchecked")
     public static <T> T convert(Properties properties, Class<T> clazz){
         try {
             T t = clazz.newInstance();
@@ -28,7 +31,7 @@ public class PropertiesUtil {
                 String key = "".equals(prefix)?"":prefix+".";
                 key+= getFiledName(field);
                 String strValue = properties.getProperty(key);
-                if(strValue != null){
+                if(strValue != null && !"".equals(strValue)){
                     Class type = field.getType();
                     //尝试将配置文件值类型转换为对应属性类型
                     //此方法字段类型只能为“只有一个String参数的构造函数的参数”
@@ -36,6 +39,9 @@ public class PropertiesUtil {
                     // 不能为int之类的基本数据类型，否则无法注入（暂时不完善）
                     Object obj = type.getConstructor(String.class).newInstance(strValue);
                     field.set(t, obj);
+                }else if(isRequired(field)){
+                    //如果参数必须设置，则抛出异常
+                    throw new MissPropertiesException("未配置:"+field.getName()+"");
                 }
             }
             return t;
@@ -69,5 +75,18 @@ public class PropertiesUtil {
             return propertiesField.name();
         }
         return field.getName();
+    }
+
+    /**
+     * 判断是否必须为字段赋值
+     * @param field
+     * @return
+     */
+    private static boolean isRequired(Field field){
+        if(field.isAnnotationPresent(PropertiesField.class)){
+            PropertiesField propertiesField = field.getAnnotation(PropertiesField.class);
+            return propertiesField.required();
+        }
+        return false;
     }
 }

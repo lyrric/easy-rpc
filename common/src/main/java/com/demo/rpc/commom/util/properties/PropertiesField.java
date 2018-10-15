@@ -22,4 +22,9 @@ public @interface PropertiesField {
      * @return
      */
     String name() default "";
+    /**
+     * 是否必须配置
+     * @return
+     */
+    boolean required() default false;
 }

@@ -17,20 +17,20 @@ public class ServerProperties {
      * rpc端口
      */
     @PropertiesField(name = "port")
-    private Integer port;
+    private Integer port = 8899;
 
     /**
      * 是否检验token
      */
     @PropertiesField(name = "login")
-    private Boolean loginFlag;
+    private Boolean loginFlag = false;
 
     /**
      * token
      */
     @PropertiesField(name = "token")
-    private String token;
+    private String token = "";
 
-    @PropertiesField(name = "service.package")
+    @PropertiesField(name = "service.package", required = true)
     private String servicePackage;
 }
