@@ -1,8 +1,12 @@
 package com.demo.rpc.server;
 
+import com.demo.rpc.commom.codec.MsgDecoder;
+import com.demo.rpc.commom.codec.MsgEncoder;
 import com.demo.rpc.commom.util.properties.PropertiesUtil;
+import com.demo.rpc.server.annotation.RpcService;
 import com.demo.rpc.server.handler.MessageHandler;
 import com.demo.rpc.server.model.ServerProperties;
+import com.demo.rpc.server.util.ClassUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -12,6 +16,10 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.apachecommons.CommonsLog;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.util.ClassUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,15 +35,15 @@ import java.util.Properties;
 @CommonsLog
 public class ServerApplication {
 
-
-
     private static final String CONFIG_FILE_NAME = "rpc-server.properties";
 
     public static void run(String[] args) {
         try {
             log.info(LocalDateTime.now().toString() + "||" + "Read properties from "+CONFIG_FILE_NAME);
             ServerProperties serverProperties = getProperties();
-        } catch (IOException e) {
+            ClassUtil.scanService(serverProperties.getServicePackage());
+            //startNetty(serverProperties);
+        }  catch ( IOException e) {
             e.printStackTrace();
         }
 
@@ -56,7 +64,7 @@ public class ServerApplication {
 
     /**
      * 启动netty
-     * @param properties
+     * @param properties 服务端配置
      */
     private static void startNetty(ServerProperties properties) throws InterruptedException {
         log.info(LocalDateTime.now().toString() + "||" +"Start netty on port:"+properties.getPort() + "||login required:" + properties.getLoginFlag());
@@ -70,6 +78,8 @@ public class ServerApplication {
                     @Override
                     protected void initChannel(SocketChannel socketChannel)  {
                         socketChannel.pipeline().addLast(new MessageHandler());
+                        socketChannel.pipeline().addLast(new MsgEncoder());
+                        socketChannel.pipeline().addLast(new MsgDecoder());
                     }
                 })
                 .option(ChannelOption.SO_BACKLOG, 128)
@@ -77,6 +87,7 @@ public class ServerApplication {
         ChannelFuture future = bootstrap.bind(properties.getPort()).sync();
         log.info(LocalDateTime.now().toString() + "||" +"Start netty success||now waiting request");
         future.channel().closeFuture().sync();
-
     }
+
+
 }

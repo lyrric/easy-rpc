@@ -13,4 +13,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface RpcService {
+
+    /**
+     * 这个在实现类上，表示要实现的接口
+     * @return
+     */
+    Class<?> value();
 }

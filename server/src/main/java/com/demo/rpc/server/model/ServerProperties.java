@@ -30,4 +30,7 @@ public class ServerProperties {
      */
     @PropertiesField(name = "token")
     private String token;
+
+    @PropertiesField(name = "service.package")
+    private String servicePackage;
 }

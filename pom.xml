@@ -13,6 +13,7 @@
 		<module>server</module>
 		<module>common</module>
 		<module>simple-server</module>
+		<module>simple-api</module>
 	</modules>
 
 	<build>
