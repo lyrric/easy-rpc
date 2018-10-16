@@ -3,7 +3,7 @@ package com.demo.rpc.commom.codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.handler.codec.MessageToMessageEncoder;
+import lombok.extern.apachecommons.CommonsLog;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
@@ -13,12 +13,15 @@ import java.io.ObjectOutputStream;
  * netty消息编码
  * @author wangxiaodong
  */
+@CommonsLog
 public class MsgEncoder extends MessageToByteEncoder {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) {
+
         try( ByteArrayOutputStream bos = new ByteArrayOutputStream();
              ObjectOutputStream os = new ObjectOutputStream(bos)) {
+            log.info("消息编码，"+msg.toString());
             os.writeObject(msg);
             byte[] data = bos.toByteArray();
             //先写入四个字节的长度

@@ -33,7 +33,7 @@ import java.util.Properties;
  * @author wangxiaodong
  */
 @CommonsLog
-public class ServerApplication {
+public class RpcServerApplication {
 
     private static final String CONFIG_FILE_NAME = "rpc-server.properties";
 
@@ -42,7 +42,7 @@ public class ServerApplication {
             log.info(LocalDateTime.now().toString() + "||" + "Read properties from "+CONFIG_FILE_NAME);
             ServerProperties serverProperties = getProperties();
             ClassUtil.scanService(serverProperties.getServicePackage());
-            //startNetty(serverProperties);
+            startNetty(serverProperties);
         }  catch ( IOException e) {
             e.printStackTrace();
         }
@@ -61,33 +61,38 @@ public class ServerApplication {
         in.close();
         return PropertiesUtil.convert(properties, ServerProperties.class);
     }
-
     /**
      * 启动netty
      * @param properties 服务端配置
      */
-    private static void startNetty(ServerProperties properties) throws InterruptedException {
+    private static void startNetty(ServerProperties properties){
         log.info(LocalDateTime.now().toString() + "||" +"Start netty on port:"+properties.getPort() + "||login required:" + properties.getLoginFlag());
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-        ServerBootstrap bootstrap = new ServerBootstrap();
-        bootstrap.group(bossGroup, workerGroup)
-                .channel(NioServerSocketChannel.class)
-                .childHandler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel socketChannel)  {
-                        socketChannel.pipeline().addLast(new MessageHandler());
-                        socketChannel.pipeline().addLast(new MsgEncoder());
-                        socketChannel.pipeline().addLast(new MsgDecoder());
-                    }
-                })
-                .option(ChannelOption.SO_BACKLOG, 128)
-                .childOption(ChannelOption.SO_KEEPALIVE, true);
-        ChannelFuture future = bootstrap.bind(properties.getPort()).sync();
-        log.info(LocalDateTime.now().toString() + "||" +"Start netty success||now waiting request");
-        future.channel().closeFuture().sync();
-    }
+        try {
+            ServerBootstrap bootstrap = new ServerBootstrap();
+            bootstrap.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel socketChannel)  {
+                            socketChannel.pipeline().addLast(new MsgEncoder());
+                            socketChannel.pipeline().addLast(new MsgDecoder());
+                            socketChannel.pipeline().addLast(new MessageHandler());
+                        }
+                    })
+                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true);
+            ChannelFuture future = bootstrap.bind(properties.getPort()).sync();
+            log.info(LocalDateTime.now().toString() + "||" +"Start netty success||now waiting request");
+            future.channel().closeFuture().sync();
+        }catch (InterruptedException e){
+            e.printStackTrace();
+            bossGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();
+        }
 
+    }
 
 }

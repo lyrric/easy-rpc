@@ -12,6 +12,10 @@ import com.demo.rpc.simple.api.service.TestService;
 @RpcService(TestService.class)
 public class TestServiceImpl implements TestService {
 
+    public TestServiceImpl() {
+        System.out.println("1111");
+    }
+
     @Override
     public User findById(Integer id) {
         User user = new User();

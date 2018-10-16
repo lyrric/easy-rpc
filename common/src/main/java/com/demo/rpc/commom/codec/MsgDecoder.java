@@ -3,6 +3,7 @@ package com.demo.rpc.commom.codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import lombok.extern.apachecommons.CommonsLog;
 
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
@@ -13,6 +14,7 @@ import java.util.List;
  * netty消息解码
  * @author wangxiaodong
  */
+@CommonsLog
 public class MsgDecoder extends ByteToMessageDecoder {
 
     /**
@@ -22,6 +24,7 @@ public class MsgDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        log.info("消息解码");
         //判断消息头是否传送完毕
         if(in.readableBytes() < HEAD_LENGTH){
             return;

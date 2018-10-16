@@ -29,8 +29,9 @@ public class ClassUtil {
      * @param clazz 实现类
      */
     private static void add(String className, Object obj, Class<?> clazz){
-        if(serviceMap == null)
-            serviceMap=new HashMap<>();
+        if(serviceMap == null) {
+            serviceMap = new HashMap<>();
+        }
         serviceMap.put(className, new ServiceItem(obj, clazz));
     }
 
@@ -51,6 +52,30 @@ public class ClassUtil {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * 获取指定类的实例
+     * @param className 类的全局限定名称
+     * @return
+     */
+    public static Object get(String className){
+        ServiceItem serviceItem = serviceMap.get(className);
+        if(serviceItem == null) {
+            return null;
+        }
+       synchronized (serviceMap.get(className)){
+            if(serviceItem.getObject() != null){
+                return serviceItem.getObject();
+            }
+           try {
+              return serviceItem.getClazz().newInstance();
+           } catch (InstantiationException | IllegalAccessException e) {
+               e.printStackTrace();
+               return null;
+           }
+       }
+
     }
     @Data
     private static class ServiceItem {

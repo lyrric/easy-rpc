@@ -1,14 +1,16 @@
-package com.demo.rpc.commom;
+package com.demo.rpc.commom.model;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * Created on 2018/10/15.
- *
+ * rpc请求
  * @author wangxiaodong
  */
 @Data
-public class RpcRequest {
+public class RpcRequest implements Serializable {
     /**
      * requestId
      */
@@ -24,7 +26,7 @@ public class RpcRequest {
     /**
      * 参数类型
      */
-    private Class<?> parameterTypes;
+    private Class<?>[] parameterTypes;
     /**
      * 参数
      */
